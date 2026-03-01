@@ -1,47 +1,4 @@
-
-
-# Tutorial 1: Introduction to ROS2
-
-#### Development of Intelligent Systems, FRI, 2025/2026
-
-The focus of the first tutorial is to get familiar with the basics of the [ROS 2](http://www.ros.org) framework. You will learn to write your own programs within the system, how to execute it properly and communicate with other programs. This tutorial will introduce several important concepts that are crucial for further tutorials, so it is recommended that you refresh the topics after the end of the formal laboratory time at home. After you explore the tutorial, you will need to submit two files as **Homework 1** on a link that will become available on Učilnica. The detailed instructions for the homework are at the end of this README.
-
-## Setting up
-
-To set up ROS 2 on your system, read the [official documentation](https://docs.ros.org/en/jazzy/index.html). In this course, we will be using release **Jazzy** Jalisco, which is a 4 year LTS release.
-
-The recommended operating systems are Ubuntu/Kubuntu/Lubuntu/etc. **24.04 LTS** [that support a Tier 1 native installation](https://www.ros.org/reps/rep-2000.html). Dual booting is generally the most hassle-free method if you have the option. We strongly recommend you to use one of the mentioned operating systems. At worst, at-least one of the team members should have it installed natively.
-
-It's also possible to get ROS 2 installed on Windows in several ways:
-- as a [pixi install](https://docs.ros.org/en/jazzy/Installation/Windows-Install-Binary.html#)
-- by installing [WSL](https://apps.microsoft.com/detail/9P9TQF7MRM4R?hl=en-us&gl=US) and [Ubuntu 24.04](https://apps.microsoft.com/detail/9nz3klhxdjp5?hl=en-US&gl=US) from the Microsoft store
-- via [VMWare/Virtualbox Ubuntu 24.04 image](https://www.osboxes.org/ubuntu/)
-
-Note that it is likely that only the native install will be capable of running the Gazebo simulator with GPU acceleration, which is a requirement for real-time simulation. Please note that we might not be able to help you with issues you encounter with a Windows installation of ROS2.
-
-Example code will be available for download as one [metapackage](https://docs.ros.org/en/jazzy/How-To-Guides/Using-Variants.html) (package that only contains other subpackages) per tutorial.
-
-## Concepts and terminology
-
-ROS 2 is a complex distributed system that introduces a few concepts that are good to know under their established expressions:
-
-- [Basic concepts](https://docs.ros.org/en/jazzy/Concepts/Basic.html): nodes, topics, parameters, launch files, cli tools
-- [Intermediate concepts](https://docs.ros.org/en/jazzy/Concepts/Intermediate.html): coordinate frames, actions and tasks, message ontology
-- [Advanced concepts](https://docs.ros.org/en/jazzy/Concepts/Advanced.html): build system, internal interfaces
-
-More info on the most important concepts:
-
-- [Nodes](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html)
-	- Nodes are standalone programs that perform some function, such as reading from a sensor or processing some data. They communicate with other nodes via topics. Nodes can subscribe to different topics, listen for data or events and react accordingly. They can also set up new topics to which they publish results.
-
-- [Topics](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
-	- Topics are data channels for communication between nodes. Each topic has a data type that defines the format of the data published to it. Nodes can subscribe to topics and receive data when it is published using a callback function.
-
-- [Services](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html)
-	- Services are an on-demand method of node communication. A node can create a service that waits for requests and returns the response. The type of request and response message types is defined in a `.srv` file.
-
-- [Actions](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html)
-	- Actions are used for more complex long-running tasks, such as navigation. The client sets a goal, and the action server provides feedback during the execution and notifies of the goal being reached. During execution, the action can also be cancelled if needed.
+# Tutorial 1: Exploring ROS2 framework
 
 ## Exploring ROS 2
 
@@ -75,20 +32,199 @@ Run the node dis_tutorial1/draw_square.py, and observe its effect on the turtle.
 Answer the following questions:
 
 - Which **nodes** are currently active?
+```bash
+andrej@Zenbook-14X:~$ ros2 node list
+/draw_square
+/turtlesim
+```
 - What **topics** are currently active?
+```bash
+andrej@Zenbook-14X:~$ ros2 topic list
+/parameter_events
+/rosout
+/turtle1/cmd_vel
+/turtle1/color_sensor
+/turtle1/pose
+```
 - What is the **message type** for each topic?
+```bash
+andrej@Zenbook-14X:~$ ros2 topic list -t
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/rosout [rcl_interfaces/msg/Log]
+/turtle1/cmd_vel [geometry_msgs/msg/Twist]
+/turtle1/color_sensor [turtlesim/msg/Color]
+/turtle1/pose [turtlesim/msg/Pose]
+```
 - To which topics is each node **publishing**?
+```bash
+andrej@Zenbook-14X:~$ ros2 node info /turtlesim
+ros2 node info /draw_square
+/turtlesim
+  Subscribers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /turtle1/cmd_vel: geometry_msgs/msg/Twist
+  Publishers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+    /turtle1/color_sensor: turtlesim/msg/Color
+    /turtle1/pose: turtlesim/msg/Pose
+  Service Servers:
+    /clear: std_srvs/srv/Empty
+    /kill: turtlesim/srv/Kill
+    /reset: std_srvs/srv/Empty
+    /spawn: turtlesim/srv/Spawn
+    /turtle1/set_pen: turtlesim/srv/SetPen
+    /turtle1/teleport_absolute: turtlesim/srv/TeleportAbsolute
+    /turtle1/teleport_relative: turtlesim/srv/TeleportRelative
+    /turtlesim/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /turtlesim/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /turtlesim/get_parameters: rcl_interfaces/srv/GetParameters
+    /turtlesim/get_type_description: type_description_interfaces/srv/GetTypeDescription
+    /turtlesim/list_parameters: rcl_interfaces/srv/ListParameters
+    /turtlesim/set_parameters: rcl_interfaces/srv/SetParameters
+    /turtlesim/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+  Service Clients:
+
+  Action Servers:
+    /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
+  Action Clients:
+
+/draw_square
+  Subscribers:
+    /turtle1/pose: turtlesim/msg/Pose
+  Publishers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+    /turtle1/cmd_vel: geometry_msgs/msg/Twist
+  Service Servers:
+    /draw_square/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /draw_square/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /draw_square/get_parameters: rcl_interfaces/srv/GetParameters
+    /draw_square/get_type_description: type_description_interfaces/srv/GetTypeDescription
+    /draw_square/list_parameters: rcl_interfaces/srv/ListParameters
+    /draw_square/set_parameters: rcl_interfaces/srv/SetParameters
+    /draw_square/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+  Service Clients:
+    /reset: std_srvs/srv/Empty
+  Action Servers:
+
+  Action Clients:
+```
 - To which topics is each node **subscribed**?
 - What are the packages that define different **message types**?
+```bash
+andrej@Zenbook-14X:~$ ros2 pkg list | grep msgs
+action_msgs
+actionlib_msgs
+diagnostic_msgs
+geometry_msgs
+lifecycle_msgs
+map_msgs
+nav_msgs
+pcl_msgs
+pendulum_msgs
+rosgraph_msgs
+sensor_msgs
+sensor_msgs_py
+service_msgs
+shape_msgs
+statistics_msgs
+std_msgs
+stereo_msgs
+tf2_geometry_msgs
+tf2_msgs
+tf2_sensor_msgs
+trajectory_msgs
+unique_identifier_msgs
+visualization_msgs
+```
 - Which **parameters** can be set on which nodes?
+```bash
+andrej@Zenbook-14X:~$ ros2 param list
+/draw_square:
+  start_type_description_service
+  use_sim_time
+/turtlesim:
+  background_b
+  background_g
+  background_r
+  holonomic
+  qos_overrides./parameter_events.publisher.depth
+  qos_overrides./parameter_events.publisher.durability
+  qos_overrides./parameter_events.publisher.history
+  qos_overrides./parameter_events.publisher.reliability
+  start_type_description_service
+  use_sim_time
+```
 
 Additionally, try to:
 - Get a **visualization** of all the nodes and topics in the system.
+`andrej@Zenbook-14X:~$ rqt_graph`
 - Get a printout of all the **packages** installed in the system.
+```bash
+andrej@Zenbook-14X:~$ ros2 pkg list
+action_msgs
+action_tutorials_cpp
+action_tutorials_interfaces
+action_tutorials_py
+actionlib_msgs
+ament_cmake
+ament_cmake_auto
+ament_cmake_copyright
+...
+```
 - Get a printout of all the **messages** installed in the system.
+```bash
+andrej@Zenbook-14X:~$ ros2 interface list | grep msg
+    action_msgs/msg/GoalInfo
+    action_msgs/msg/GoalStatus
+    action_msgs/msg/GoalStatusArray
+    actionlib_msgs/msg/GoalID
+    actionlib_msgs/msg/GoalStatus
+    actionlib_msgs/msg/GoalStatusArray
+    builtin_interfaces/msg/Duration
+    builtin_interfaces/msg/Time
+    diagnostic_msgs/msg/DiagnosticArray
+    diagnostic_msgs/msg/DiagnosticStatus
+	...
+```
 - **Print** out the messages being published on each topic.
+```bash
+# Velocity commands from draw_square
+ros2 topic echo /turtle1/cmd_vel
+
+# Turtle position and angle
+ros2 topic echo /turtle1/pose
+
+# Color under turtle's pen
+ros2 topic echo /turtle1/color_sensor
+```
 - **Publish** a message on each topic.
+```bash
+andrej@Zenbook-14X:~ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist \ \
+  "{linear: {x: 1.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}"
+publisher: beginning loop
+publishing #1: geometry_msgs.msg.Twist(linear=geometry_msgs.msg.Vector3(x=1.0, y=0.0, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=1.0))
+
+andrej@Zenbook-14X:~ros2 service call /turtle1/teleport_absolute turtlesim/srv/TeleportAbsolute \ \
+  "{x: 5.0, y: 5.0, theta: 0.0}"
+waiting for service to become available...
+requester: making request: turtlesim.srv.TeleportAbsolute_Request(x=5.0, y=5.0, theta=0.0)
+
+response:
+turtlesim.srv.TeleportAbsolute_Response()
+```
+
 - **Set** the background color of turtlesim to a color of your choice.
+```bash
+andrej@Zenbook-14X:~$ ros2 param set /turtlesim background_r 0
+ros2 param set /turtlesim background_g 0
+ros2 param set /turtlesim background_b 139
+Set parameter successful
+Set parameter successful
+Set parameter successful
+```
+
 
 Explore the usage of other commands that are found in the [ROS 2 Cheatsheet](https://www.theconstructsim.com/wp-content/uploads/2021/10/ROS2-Command-Cheat-Sheets-updated.pdf). You can also find the full turtlesim documentation [here](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Introducing-Turtlesim/Introducing-Turtlesim.html#prerequisites).
 
